@@ -11,8 +11,7 @@ permission=$4
 : ${permission:=755}
 
 xmjOwn() {
-  sudo chown $owner -R $folder
-  sudo chgrp $group -R $folder
+  sudo chown $owner:$group -R $folder
   sudo chmod $permission -R $folder
 }
 
