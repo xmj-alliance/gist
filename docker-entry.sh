@@ -19,4 +19,7 @@ else
   echo "$username:$userpasswd" | chpasswd
 fi
 
+# su-exec version
 exec su-exec $userid "$@"
+# sudo version:
+# exec sudo -u $(id -nu $userid) "$@"
