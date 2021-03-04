@@ -1,19 +1,22 @@
-#!/bin/sh
-# This file is used to change permission for a normal user on docker container run.
+#!/bin/bash
+# Execute the up-coming commands on behalf of a specific user
+# If userid exists, we will use this existing user and ignores the username/userpasswd
+# Otherwise, we will create a new user based on the given userid, username and userpasswd
 
-username=$EXEC_USER
-userid=${EXEC_USER_ID}
+userpasswd=$EXEC_PASSWD
+userid=$EXEC_USER_ID
+username=$EXEC_USER_NAME
 
-folder=$1
-permission=$2
+# Check if userid exists
+if id "$userid" >/dev/null 2>&1; then
+  username=$(id -nu $userid)
+  echo "Waking up $username ..."
+else
+  echo "Summoning $username - UID:$userid ..."
+  # Add user
+  useradd -m -s /bin/bash -u $userid $username
+  # Change password
+  echo "$username:$userpasswd" | chpasswd
+fi
 
-: ${folder:="."}
-: ${permission:=755}
-
-echo "Summoning $username - UID:$userid ..."
-
-# Add local user
-adduser $username -u $userid -D -s /bin/sh
-chown -R $username $folder
-chmod -R $permission $folder
-exec su-exec $username "$@"
+exec su-exec $userid "$@"
